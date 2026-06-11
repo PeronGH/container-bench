@@ -1,12 +1,18 @@
-FROM gcc:15.2-trixie
+FROM debian:trixie-slim
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         7zip \
         bc \
         bison \
+        ca-certificates \
+        curl \
         flex \
+        gcc \
+        libc6-dev \
         libelf-dev \
+        make \
+        xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
 ARG KERNEL_VERSION=6.18.35
