@@ -2,43 +2,13 @@
 set -eu
 
 NPROC=$(nproc)
-steps=${1:-lzma-1,sha256-1,aes256-1,lzma,sha256,aes256,kernel,mongo-insert,mongo-read,mongo-mixed}
+steps=${1:-lzma-1,sha256-1,aes256-1,lzma,sha256,aes256,kernel}
 
 i=0
 
 step() {
     i=$((i + 1))
     echo "($i/$TOTAL) running $1"
-}
-
-ycsb() {
-    go-ycsb "$1" mongodb \
-        -p workload=core \
-        -p recordcount=100000 \
-        -p operationcount=200000 \
-        -p threadcount="$NPROC" \
-        -p readproportion="$2" \
-        -p updateproportion="$3"
-}
-
-mongod_up=
-mongo_loaded=
-
-start_mongod() {
-    [ -n "$mongod_up" ] && return
-    dbdir=$(mktemp -d)
-    if ! mongod --dbpath "$dbdir" --bind_ip 127.0.0.1 --wiredTigerCacheSizeGB 1 \
-            --fork --logpath "$dbdir/mongod.log" >/dev/null; then
-        echo "mongod failed to start (this runtime likely lacks AVX support)" >&2
-        exit 1
-    fi
-    mongod_up=1
-}
-
-ensure_loaded() {
-    [ -n "$mongo_loaded" ] && return
-    ycsb load 0 0 >/dev/null
-    mongo_loaded=1
 }
 
 run_step() {
@@ -76,24 +46,6 @@ run_step() {
             echo "kernel built in $(($(date +%s) - start))s"
             rm -rf "$builddir"
             ;;
-        mongo-insert)
-            start_mongod
-            step "mongodb insert"
-            ycsb load 0 0
-            mongo_loaded=1
-            ;;
-        mongo-read)
-            start_mongod
-            ensure_loaded
-            step "mongodb read"
-            ycsb run 1 0
-            ;;
-        mongo-mixed)
-            start_mongod
-            ensure_loaded
-            step "mongodb mixed"
-            ycsb run 0.5 0.5
-            ;;
     esac
 }
 
@@ -104,7 +56,7 @@ IFS=' '
 
 for s in "$@"; do
     case "$s" in
-        lzma-1 | sha256-1 | aes256-1 | lzma | sha256 | aes256 | kernel | mongo-insert | mongo-read | mongo-mixed) ;;
+        lzma-1 | sha256-1 | aes256-1 | lzma | sha256 | aes256 | kernel) ;;
         *)
             echo "unknown step: $s" >&2
             exit 1
@@ -117,8 +69,3 @@ TOTAL=$#
 for s in "$@"; do
     run_step "$s"
 done
-
-if [ -n "$mongod_up" ]; then
-    mongod --dbpath "$dbdir" --shutdown >/dev/null
-    rm -rf "$dbdir"
-fi

@@ -1,8 +1,8 @@
 # container-bench
 
-CPU benchmark suite in a container: 7-Zip (LZMA, SHA256, AES256CBC), a Linux
-kernel `tinyconfig` build, and MongoDB under YCSB load. Built for comparing
-container runtimes; published for `linux/amd64` and `linux/arm64`.
+CPU benchmark suite in a container: 7-Zip (LZMA, SHA256, AES256CBC) and a Linux
+kernel `tinyconfig` build. Built for comparing container runtimes; published
+for `linux/amd64` and `linux/arm64`.
 
 ## Usage
 
@@ -25,9 +25,3 @@ Steps run in the order given:
 | `sha256-1`, `sha256` | 7-Zip SHA256 benchmark, 1 core / all cores |
 | `aes256-1`, `aes256` | 7-Zip AES256CBC benchmark, 1 core / all cores |
 | `kernel` | Linux kernel tinyconfig build, timed |
-| `mongo-insert` | YCSB load phase, 100k records |
-| `mongo-read` | YCSB read-only workload, 200k ops |
-| `mongo-mixed` | YCSB 50/50 read-update workload, 200k ops |
-
-Note: MongoDB requires AVX on x86-64; the `mongo-*` steps abort on runtimes
-that do not expose it.
