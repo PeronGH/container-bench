@@ -12,15 +12,15 @@ step() {
 
 step "7zip LZMA (1 core)"
 7z b -mmt1
-step "7zip LZMA (all cores)"
+step "7zip LZMA ($NPROC cores)"
 7z b
 step "7zip SHA256 (1 core)"
 7z b -mm=SHA256 -mmt1
-step "7zip SHA256 (all cores)"
+step "7zip SHA256 ($NPROC cores)"
 7z b -mm=SHA256 -mmts="$NPROC"
 step "7zip AES256CBC (1 core)"
 7z b -mm=AES256CBC -mmt1
-step "7zip AES256CBC (all cores)"
+step "7zip AES256CBC ($NPROC cores)"
 7z b -mm=AES256CBC -mmts="$NPROC"
 step "kernel build"
 builddir=$(mktemp -d)
