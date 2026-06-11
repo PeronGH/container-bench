@@ -19,11 +19,11 @@ run_step() {
             ;;
         sha256-1)
             step "7zip SHA256 (1 core)"
-            7z b -mm=SHA256 -mmt1
+            7z b -mm=SHA256 -mdf=22 -mmt1
             ;;
         aes256-1)
             step "7zip AES256CBC (1 core)"
-            7z b -mm=AES256CBC -mmt1
+            7z b -mm=AES256CBC -mdf=22 -mmt1
             ;;
         lzma)
             step "7zip LZMA ($NPROC cores)"
@@ -31,11 +31,11 @@ run_step() {
             ;;
         sha256)
             step "7zip SHA256 ($NPROC cores)"
-            7z b -mm=SHA256 -mmts="$NPROC"
+            7z b -mm=SHA256 -mdf=22 -mmts="$NPROC"
             ;;
         aes256)
             step "7zip AES256CBC ($NPROC cores)"
-            7z b -mm=AES256CBC -mmts="$NPROC"
+            7z b -mm=AES256CBC -mdf=22 -mmts="$NPROC"
             ;;
         kernel)
             step "kernel build"
