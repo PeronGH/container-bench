@@ -1,6 +1,9 @@
 FROM golang:1.26-trixie AS ycsb
 
-RUN GOBIN=/out go install github.com/pingcap/go-ycsb/cmd/go-ycsb@f030f9942393a8febbf4365c2d582711723159f5
+RUN git init -q /src \
+    && git -C /src fetch -q --depth 1 https://github.com/pingcap/go-ycsb f030f9942393a8febbf4365c2d582711723159f5 \
+    && git -C /src checkout -q FETCH_HEAD \
+    && go build -C /src -o /usr/local/bin/go-ycsb ./cmd/go-ycsb
 
 FROM debian:trixie-slim
 
@@ -38,7 +41,7 @@ RUN case "$TARGETARCH" in \
     && curl -fsSL "https://fastdl.mongodb.org/linux/mongodb-linux-${arch}-ubuntu2404-${MONGODB_VERSION}.tgz" \
         | tar -xz -C /usr/local/bin --strip-components=2 --wildcards '*/bin/mongod'
 
-COPY --from=ycsb /out/go-ycsb /usr/local/bin/go-ycsb
+COPY --from=ycsb /usr/local/bin/go-ycsb /usr/local/bin/go-ycsb
 
 COPY --chmod=755 entrypoint.sh /usr/local/bin/entrypoint.sh
 
