@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-TOTAL=6
+TOTAL=7
 i=0
 NPROC=$(nproc)
 
@@ -22,3 +22,10 @@ step "7zip AES256CBC (1 core)"
 7z b -mm=AES256CBC -mmt1
 step "7zip AES256CBC (all cores)"
 7z b -mm=AES256CBC -mmts="$NPROC"
+step "kernel build"
+builddir=$(mktemp -d)
+make -C /usr/src/linux O="$builddir" tinyconfig >/dev/null
+start=$(date +%s)
+make -C /usr/src/linux O="$builddir" -j"$NPROC" >/dev/null
+echo "kernel built in $(($(date +%s) - start))s"
+rm -rf "$builddir"
