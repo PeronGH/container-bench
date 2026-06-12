@@ -1,8 +1,9 @@
 # container-bench
 
-CPU benchmark suite in a container: 7-Zip (LZMA, SHA256, AES256CBC) and a Linux
-kernel `tinyconfig` build. Built for comparing container runtimes; published
-for `linux/amd64` and `linux/arm64`.
+Benchmark suite in a container: an offline `apt install` of the benchmark
+toolchain, 7-Zip (LZMA, SHA256, AES256CBC), and a Linux kernel `tinyconfig`
+build. Built for comparing container runtimes; published for `linux/amd64`
+and `linux/arm64`.
 
 ## Usage
 
@@ -17,7 +18,10 @@ Run a subset of steps by passing a comma-separated list:
 docker run --rm ghcr.io/perongh/container-bench lzma-1,sha256,kernel
 ```
 
-Steps run in the order given:
+Every run starts with a timed `apt install` of the pre-downloaded benchmark
+toolchain (7zip, gcc, make, ...) — the image ships the `.deb`s but nothing
+installed, so this doubles as a package-install benchmark. The remaining
+steps run in the order given:
 
 | Step | Workload |
 | --- | --- |

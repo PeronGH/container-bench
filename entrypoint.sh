@@ -37,6 +37,14 @@ run_step() {
             step "7zip AES256CBC ($NPROC cores)"
             7z b -mm=AES256CBC -mdf=22 -mmts="$NPROC"
             ;;
+        apt)
+            step "apt install (pre-downloaded)"
+            start=$(date +%s)
+            # shellcheck disable=SC2086 # intentional word splitting of the package list
+            apt-get install -y --no-install-recommends --no-download \
+                $BENCH_APT_PACKAGES >/dev/null
+            echo "apt installed in $(($(date +%s) - start))s"
+            ;;
         kernel)
             step "kernel build"
             builddir=$(mktemp -d)
@@ -64,8 +72,9 @@ for s in "$@"; do
     esac
 done
 
-TOTAL=$#
+TOTAL=$(($# + 1))
 
+run_step apt
 for s in "$@"; do
     run_step "$s"
 done
