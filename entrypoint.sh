@@ -6,6 +6,15 @@ steps=${1:-lzma-1,sha256-1,aes256-1,lzma,sha256,aes256,kernel}
 
 i=0
 
+apt_pkgs() {
+    # shellcheck disable=SC2086 # intentional word splitting of the package list
+    apt-get "$@" $BENCH_APT_PACKAGES >/dev/null
+}
+
+apt_install() {
+    apt_pkgs install -y --no-install-recommends --no-download
+}
+
 step() {
     i=$((i + 1))
     echo "($i/$TOTAL) running $1"
@@ -38,12 +47,13 @@ run_step() {
             7z b -mm=AES256CBC -mdf=22 -mmts="$NPROC"
             ;;
         apt)
-            step "apt install (pre-downloaded)"
+            step "apt install/purge/install (pre-downloaded)"
             start=$(date +%s)
-            # shellcheck disable=SC2086 # intentional word splitting of the package list
-            apt-get install -y --no-install-recommends --no-download \
-                $BENCH_APT_PACKAGES >/dev/null
-            echo "apt installed in $(($(date +%s) - start))s"
+            apt_install
+            # --auto-remove so the reinstall redoes the dependencies, not just the 8 named debs
+            apt_pkgs purge -y --auto-remove
+            apt_install
+            echo "apt cycle finished in $(($(date +%s) - start))s"
             ;;
         kernel)
             step "kernel build"

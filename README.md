@@ -18,10 +18,10 @@ Run a subset of steps by passing a comma-separated list:
 docker run --rm ghcr.io/perongh/container-bench lzma-1,sha256,kernel
 ```
 
-Every run starts with a timed `apt install` of the pre-downloaded benchmark
-toolchain (7zip, gcc, make, ...) — the image ships the `.deb`s but nothing
-installed, so this doubles as a package-install benchmark. The remaining
-steps run in the order given:
+Every run starts with a timed apt install → purge → install cycle of the
+pre-downloaded benchmark toolchain (7zip, gcc, make, ...) — the image ships
+the `.deb`s but nothing installed, so this doubles as a package-install
+benchmark. The remaining steps run in the order given:
 
 | Step | Workload |
 | --- | --- |
